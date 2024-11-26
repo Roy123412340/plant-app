@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نبتتك 🌱</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f8ff; /* خلفية خفيفة بدلاً من صورة */
+      color: black; /* نصوص باللون الأسود لظهور واضح */
+      height: 100vh; /* تأكيد أن الصفحة تملأ كامل الشاشة */
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* لتوسيط المحتويات عموديًا */
+      align-items: center; /* لتوسيط المحتويات أفقيًا */
+    }
+    #plant {
+      display: block;
+      margin: 20px auto;
+      width: 50px; /* العرض الابتدائي للنبتة */
+      transition: width 1s ease, transform 0.5s ease;
+    }
+    .withered {
+      filter: grayscale(100%);
+      transform: rotate(15deg);
+    }
+    #status {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    #countdown {
+      font-size: 18px;
+      color: red;
+    }
+    #points {
+      font-size: 25px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>نبتتك 🌱</h1>
+  <p>ابقَ على الصفحة لتكبير النبتة، إذا غادرت، ستذبل! 😢</p>
+  
+  <!-- صورة النبتة -->
+  <img id="plant" src="https://cdn-icons-png.flaticon.com/512/766/766109.png" alt="Plant">
+  
+  <p id="status">النبتة بصحة جيدة! 🌿</p>
+  <p id="countdown"></p> <!-- عداد الذبول -->
+  
+  <p id="points">النقاط: 0</p> <!-- عرض النقاط -->
+
+  <script>
+    const plant = document.getElementById('plant');
+    const status = document.getElementById('status');
+    const countdown = document.getElementById('countdown');
+    const pointsDisplay = document.getElementById('points');
+    let width = 50; // العرض الابتدائي للنبتة
+    let points = 0; // عدد النقاط
+    let growInterval;
+    let witherInterval;
+    let timeAway = 0; // الوقت الذي غاب فيه المستخدم
+    let plantStage = 'بذرة'; // حالة النبتة (بذرة, نبتة صغيرة, شجرة)
+
+    // دالة لتغيير مراحل النبتة حسب حجمها
+    function updatePlantStage() {
+      if (width < 100) {
+        plantStage = 'بذرة';
+      } else if (width < 200) {
+        plantStage = 'نبتة صغيرة';
+      } else {
+        plantStage = 'شجرة';
+      }
+      status.textContent = النبتة في مرحلة: ${plantStage};
+    }
+
+    // دالة لتكبير النبتة وزيادة النقاط
+    function growPlant() {
+      growInterval = setInterval(() => {
+        width += 10;
+        plant.style.width = ${width}px;
+        points += 5; // كلما كبرت النبتة، تزداد النقاط
+        pointsDisplay.textContent = النقاط: ${points}; // تحديث النقاط
+        updatePlantStage(); // تحديث المرحلة
+      }, 1000);
+    }
+
+    // دالة لتذبل النبتة (عند مغادرة المستخدم)
+    function witherPlant() {
+      clearInterval(growInterval);
+      status.textContent = "النبتة بدأت تذبل... 😢";
+      plant.classList.add('withered');
+      
+      // عداد الذبول
+      let remainingTime = 10; // مدة 10 ثواني قبل أن تموت النبتة
+      countdown.textContent = الوقت المتبقي: ${remainingTime} ثانية;
+      witherInterval = setInterval(() => {
+        remainingTime -= 1;
+        countdown.textContent = الوقت المتبقي: ${remainingTime} ثانية;
+        if (remainingTime <= 0) {
+          clearInterval(witherInterval);
+          plant.style.filter = 'grayscale(100%)'; // النبتة تموت تمامًا
+          countdown.textContent = "النبتة ماتت! 💀";
+        }
+      }, 1000);
+    }
+
+    // عند الرجوع للصفحة
+    window.addEventListener('focus', () => {
+      growPlant(); // تبدأ بالنمو مرة أخرى إذا رجع المستخدم
+      countdown.textContent = ''; // إخفاء عداد الذبول
+    });
+
+    // عند مغادرة الصفحة
+    window.addEventListener('blur', () => {
+      witherPlant(); // تبدأ في الذبول إذا غادر المستخدم
+    });
+
+    // بدء النمو عند فتح الصفحة
+    growPlant();
+
+  </script>
+</body>
+</html>
